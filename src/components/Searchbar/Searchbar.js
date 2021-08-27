@@ -14,17 +14,20 @@ class Searchbar extends Component {
     };
 
     handleSubmit = e => {
+        const { searchQuery } = this.state;
         e.preventDefault();
 
-        if (this.state.searchQuery.trim() === '') {
+        if (searchQuery.trim() === '') {
             toast.warn('Введите ваш запрос');
             return;
         }
 
-        this.props.onSubmit(this.state.searchQuery);
+        this.props.onSubmit(searchQuery);
         this.setState({ searchQuery: '' });
     };
     render() {
+        const { handlImageChange } = this;
+        const { searchQuery } = this.state;
         return (
             <header className={style.searchbar}>
                 <form
@@ -50,8 +53,8 @@ class Searchbar extends Component {
                         autoComplete="off"
                         autoFocus
                         placeholder="Search images and photos"
-                        onChange={this.handlImageChange}
-                        value={this.state.searchQuery}
+                        onChange={handlImageChange}
+                        value={searchQuery}
                     />
                 </form>
             </header>

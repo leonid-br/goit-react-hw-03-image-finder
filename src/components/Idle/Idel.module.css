@@ -1,0 +1,9 @@
+.text {
+    font-weight: bold;
+    text-align: center;
+}
+
+.icon {
+    position: relative;
+    left: 50%;
+}
