@@ -1,4 +1,5 @@
 import style from './ImageGalleryItem.module.css';
+
 export default function ImageGalleryItem({
     id,
     largeImageURL,
