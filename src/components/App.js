@@ -23,11 +23,12 @@ class App extends Component {
     };
 
     componentDidUpdate(prevProps, prevState) {
-        if (this.state.searchQuery.trim() === '') {
+        const { searchQuery } = this.state;
+        if (searchQuery.trim() === '') {
             toast.warn('Введите ваш запрос');
             return;
         }
-        if (prevState.searchQuery !== this.state.searchQuery) {
+        if (prevState.searchQuery !== searchQuery) {
             this.setState({ imgArr: [] });
             this.imgFetch();
         }
@@ -38,10 +39,11 @@ class App extends Component {
     };
 
     imgFetch = () => {
+        const { searchQuery } = this.state;
         this.setState({ status: 'pending' });
 
         imgAPI
-            .fetchImg(this.state.searchQuery)
+            .fetchImg(searchQuery)
             .then(imgArr =>
                 this.setState(prevState => {
                     if (imgArr.hits.length !== 0) {
@@ -57,7 +59,7 @@ class App extends Component {
                     }
                     return this.setState({
                         status: 'rejected',
-                        error: `Картинок по запросу ${this.state.searchQuery} нет`,
+                        error: `Картинок по запросу ${searchQuery} нет`,
                     });
                 }),
             )
