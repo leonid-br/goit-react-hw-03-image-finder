@@ -18,53 +18,49 @@ class App extends Component {
         targetImg: null,
         imgName: null,
         status: 'idle',
-        imgArr: null,
+        imgArr: [],
         error: null,
     };
 
-    handleInputChange = e => {
-        this.setState({
-            searchQuery: e.target.value.toLowerCase(),
-        });
-    };
-
-    handleFormSubmit = e => {
-        e.preventDefault();
-
-        const { searchQuery } = this.state;
-
-        if (searchQuery.trim() === '') {
+    componentDidUpdate(prevProps, prevState) {
+        if (this.state.searchQuery.trim() === '') {
             toast.warn('Введите ваш запрос');
             return;
         }
-        this.setState({ status: 'pending' });
-        imgAPI
-            .fetchImg(searchQuery)
-            .then(imgArr =>
-                this.checkedEmptyArr(imgArr, searchQuery),
-            )
-            .catch(error =>
-                this.setState({
-                    error,
-                }),
-            );
+        if (prevState.searchQuery !== this.state.searchQuery) {
+            this.setState({ imgArr: [] });
+            this.imgFetch();
+        }
+    }
+
+    handleFormSubmit = query => {
+        this.setState({ searchQuery: query });
     };
 
-    onLoadMore = () => {
-        const { searchQuery } = this.state;
+    imgFetch = () => {
+        this.setState({ status: 'pending' });
 
-        options.pageNumber += 1;
         imgAPI
-            .fetchImg(searchQuery)
-            .then(imgArr => {
-                return this.setState(prevState => ({
-                    imgArr: [
-                        ...prevState.imgArr,
-                        ...imgArr.hits,
-                    ],
-                    status: 'resolved',
-                }));
-            })
+            .fetchImg(this.state.searchQuery)
+            .then(imgArr =>
+                this.setState(prevState => {
+                    if (imgArr.hits.length !== 0) {
+                        options.pageNumber += 1;
+
+                        return this.setState({
+                            imgArr: [
+                                ...prevState.imgArr,
+                                ...imgArr.hits,
+                            ],
+                            status: 'resolved',
+                        });
+                    }
+                    return this.setState({
+                        status: 'rejected',
+                        error: `Картинок по запросу ${this.state.searchQuery} нет`,
+                    });
+                }),
+            )
             .catch(error =>
                 this.setState({
                     error,
@@ -76,19 +72,6 @@ class App extends Component {
                     behavior: 'smooth',
                 });
             });
-    };
-
-    checkedEmptyArr = (imgArr, search) => {
-        if (imgArr.hits.length !== 0) {
-            return this.setState({
-                imgArr: imgArr.hits,
-                status: 'resolved',
-            });
-        }
-        return this.setState({
-            status: 'rejected',
-            error: `Картинок по запросу ${search} нет`,
-        });
     };
 
     toggleModal = () => {
@@ -117,16 +100,12 @@ class App extends Component {
             handleFormSubmit,
             toggleModal,
             onImgClick,
-            onLoadMore,
-            handleInputChange,
+            imgFetch,
         } = this;
 
         return (
             <div className={Style}>
-                <Searchbar
-                    onSubmit={handleFormSubmit}
-                    onChange={handleInputChange}
-                />
+                <Searchbar onSubmit={handleFormSubmit} />
 
                 <ImageGallery
                     error={error}
@@ -137,7 +116,7 @@ class App extends Component {
                 />
 
                 {status === 'resolved' && (
-                    <Button onLoadMore={onLoadMore} />
+                    <Button onLoadMore={imgFetch} />
                 )}
 
                 {showModal && (

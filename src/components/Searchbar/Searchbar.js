@@ -1,11 +1,24 @@
 import style from './Searchbar.module.css';
+import { useState } from 'react';
 
-const Searchbar = ({ onSubmit, onChange }) => {
+const Searchbar = ({ onSubmit }) => {
+    const [query, setQuery] = useState('');
+
+    const onCanhgeQuery = e => {
+        setQuery(e.currentTarget.value);
+    };
+
+    const handelSubmit = e => {
+        e.preventDefault();
+
+        onSubmit(query);
+        setQuery('');
+    };
     return (
         <header className={style.searchbar}>
             <form
                 className={style.searchForm}
-                onSubmit={onSubmit}
+                onSubmit={handelSubmit}
             >
                 <button
                     type="submit"
@@ -24,7 +37,8 @@ const Searchbar = ({ onSubmit, onChange }) => {
                     autoComplete="off"
                     autoFocus
                     placeholder="Search images and photos"
-                    onChange={onChange}
+                    onChange={onCanhgeQuery}
+                    value={query}
                 />
             </form>
         </header>
