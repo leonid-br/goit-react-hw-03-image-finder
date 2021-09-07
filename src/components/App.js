@@ -29,6 +29,7 @@ class App extends Component {
             return;
         }
         if (prevState.searchQuery !== searchQuery) {
+            this.setState({ status: 'pending' });
             this.setState({ imgArr: [] });
             this.imgFetch();
         }
@@ -40,7 +41,6 @@ class App extends Component {
 
     imgFetch = () => {
         const { searchQuery } = this.state;
-        this.setState({ status: 'pending' });
 
         imgAPI
             .fetchImg(searchQuery)
